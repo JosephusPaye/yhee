@@ -1,0 +1,17 @@
+{
+  "name": "Yhee: Time Tracker",
+  "description": "See where you spend your time while browsing.",
+  "version": "1.0",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon-16.png",
+    "19": "icon-19.png",
+    "38": "icon-38.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}
