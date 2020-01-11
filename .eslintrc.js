@@ -5,6 +5,9 @@ module.exports = {
   env: {
     node: true,
   },
+  globals: {
+    chrome: true,
+  },
   extends: ['plugin:vue/essential', '@vue/prettier'],
   rules: {
     'no-console': 'off',
