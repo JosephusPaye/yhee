@@ -1,5 +1,10 @@
 <template>
-  <Panel title="Top domains" pre-select="today" :tabs="tabs" @tab-change="onTabChange">
+  <Panel
+    title="Top domains"
+    pre-select="today"
+    :tabs="tabs"
+    @tab-change="onTabChange"
+  >
     <button
       slot="actions"
       @click="chart = chart === 'bar' ? 'pie' : 'bar'"
@@ -7,14 +12,32 @@
       :title="chart === 'bar' ? 'Show as pie chart' : 'Show as bar chart'"
     >
       <IconPieChart v-if="chart === 'bar'" />
-      <IconBarChart v-else-if="chart === 'pie'" style="transform: rotate(90deg)" />
+      <IconBarChart
+        v-else-if="chart === 'pie'"
+        style="transform: rotate(90deg)"
+      />
     </button>
     <div v-if="state === 'loading'">Loading...</div>
-    <BarChart
-      v-else-if="state === 'has-results' && chart === 'bar'"
-      :chart-data="barChartData"
-      :height="`${barChartData.labels.length * 50}px`"
-    />
+    <template v-else-if="state === 'has-results' && chart === 'bar'">
+      <BarChart
+        v-if="timespan === 'today'"
+        key="today"
+        :chart-data="barChartData"
+        :height="barChartHeight"
+      />
+      <BarChart
+        v-else-if="timespan === 'this-week'"
+        key="this-week"
+        :chart-data="barChartData"
+        :height="barChartHeight"
+      />
+      <BarChart
+        v-else-if="timespan === 'all-time'"
+        key="all-time"
+        :chart-data="barChartData"
+        :height="barChartHeight"
+      />
+    </template>
     <PieChart
       v-else-if="state === 'has-results' && chart === 'pie'"
       :chart-data="pieChartData"
@@ -54,6 +77,7 @@ export default {
     return {
       state: 'loading',
       chart: 'bar', // TODO: Remember changes across refreshes?
+      timespan: '',
       topDomains: [],
       tabs: [
         {
@@ -75,6 +99,10 @@ export default {
   computed: {
     barChartData() {
       return this.toBarChartData(this.topDomains);
+    },
+
+    barChartHeight() {
+      return `${this.topDomains.length * 40}px`;
     },
 
     pieChartData() {
@@ -103,6 +131,7 @@ export default {
         fromToday,
         10
       );
+      this.timespan = 'today';
       this.state = 'has-results';
     },
 
@@ -112,6 +141,7 @@ export default {
         fromLastSevenDays,
         10
       );
+      this.timespan = 'this-week';
       this.state = 'has-results';
     },
 
@@ -121,6 +151,7 @@ export default {
         undefined,
         10
       );
+      this.timespan = 'all-time';
       this.state = 'has-results';
     },
 

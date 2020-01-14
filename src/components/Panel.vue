@@ -14,7 +14,9 @@
         v-for="tab in tabs"
         :key="tab.id"
         @click="selectTab(tab)"
-      >{{ tab.label }}</button>
+      >
+        {{ tab.label }}
+      </button>
     </div>
     <div class="p-6">
       <slot :activeTab="activeTab"></slot>

@@ -11,7 +11,13 @@ export default {
   },
   mounted() {
     // this.chartData is a prop from the `reactiveProp` mixin
-    this.renderChart(this.chartData, this.options);
+    this.renderChart(
+      this.chartData,
+      Object.assign(
+        { responsive: true, maintainAspectRatio: false },
+        this.options
+      )
+    );
   },
 };
 </script>
