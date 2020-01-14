@@ -1,6 +1,8 @@
 // @ts-check
 import 'content-scripts-register-polyfill';
-import { log, getPermissions } from './extension';
+
+import { getPermissions } from './browser';
+import { log } from './data';
 
 /** @type {Map<string, Promise<any>>} */
 const registeredScripts = new Map();

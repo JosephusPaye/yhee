@@ -1,9 +1,9 @@
 // @ts-check
 import throttle from 'lodash.throttle';
-import { log, storeHeartbeat } from './extension';
+import { log, storeHeartbeat } from './data';
 
 /**
- * @typedef {import('./extension').Heartbeat} Heartbeat
+ * @typedef {import('./data').Heartbeat} Heartbeat
  */
 
 /** @type {(function(): void)[]} */

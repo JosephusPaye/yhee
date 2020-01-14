@@ -94,15 +94,18 @@
 import Button from './components/Button.vue';
 import {
   getActiveTab,
-  getHeartbeats,
-  heartbeatsToDurations,
-  isToday,
-  humanReadableDuration,
   hasPermission,
   requestPermission,
   removePermission,
   promptForReload,
-} from './extension';
+} from './browser';
+import {
+  getHeartbeats,
+  heartbeatsToDurations,
+  fromToday,
+  humanReadableDuration,
+  getTimeoutPreference,
+} from './data';
 
 export default {
   name: 'app',
@@ -115,7 +118,7 @@ export default {
       durationToday: 0,
       domain: '',
       origin: '',
-      timeoutPreference: 15 * 60 * 1000, // 15 minutes of timeout in ms
+      timeoutPreference: 0,
     };
   },
 
@@ -138,6 +141,8 @@ export default {
     const tab = await getActiveTab();
     const url = new URL(tab.url);
 
+    this.timeoutPreference = await getTimeoutPreference();
+
     if (
       url.protocol.includes('chrome') ||
       url.href.startsWith('https://chrome.google.com/webstore')
@@ -156,15 +161,11 @@ export default {
       return;
     }
 
-    const heartbeats = await getHeartbeats();
+    const heartbeats = await getHeartbeats(heartbeat => {
+      return fromToday(heartbeat) && heartbeat.origin === url.origin;
+    });
 
-    const durations = heartbeatsToDurations(
-      heartbeats,
-      this.timeoutPreference,
-      heartbeat => {
-        return isToday(heartbeat) && heartbeat.origin === url.origin;
-      }
-    );
+    const durations = heartbeatsToDurations(heartbeats, this.timeoutPreference);
 
     if (durations.length === 0) {
       this.state = 'no-data';
