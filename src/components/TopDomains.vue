@@ -102,7 +102,7 @@ export default {
     },
 
     barChartHeight() {
-      return `${this.topDomains.length * 40}px`;
+      return `${this.topDomains.length * 40 + 100}px`;
     },
 
     pieChartData() {
