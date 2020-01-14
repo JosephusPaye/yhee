@@ -1,26 +1,19 @@
+// @ts-check
 import throttle from 'lodash.throttle';
+import { log, storeHeartbeat } from './extension';
 
 /**
- * @typedef {Object} Heartbeat
- * @property {string} type - The type of event that triggered the heartbeat
- * @property {number} time - The time of the heartbeat, in ms since the epoch
- * @property {string} origin - The origin of the page at the time of the heartbeat
- * @property {string} path - `location.pathname + location.search` of the page at the time of the heartbeat
- * @property {string} title - `document.title` of the page at the time of the heartbeat
+ * @typedef {import('./extension').Heartbeat} Heartbeat
  */
 
-/**
- * @type {function[]}
- */
+/** @type {(function(): void)[]} */
 let cleanUpFunctions = [];
 
-/**
- * @type {?Heartbeat}
- */
+/** @type {(Heartbeat|undefined)} */
 let lastHeartbeat = undefined;
 
 /**
- * Create a heartbeat of the given type and for the given time.
+ * Create a heartbeat of the given type for the given time.
  *
  * @param   {string}  type  The type of event that triggered the heartbeat
  * @param   {number}  time  The current time, in ms since the epoch
@@ -47,20 +40,13 @@ function createHeartbeat(type, time = Date.now()) {
  * @param   {Heartbeat}  heartbeat  The heartbeat
  */
 function saveHeartbeat(heartbeat) {
-  console.log('saving heartbeat', heartbeat.type, heartbeat.time);
-
-  chrome.storage.local.get({ heartbeats: [] }, function({ heartbeats }) {
-    heartbeats.push(heartbeat);
-    chrome.storage.local.set({ heartbeats }, function() {
-      if (lastHeartbeat) {
-        console.log(
-          'time between last save',
-          heartbeat.time - lastHeartbeat.time
-        );
-      }
-      console.log('saved heartbeat', heartbeat);
-      lastHeartbeat = heartbeat;
-    });
+  log('saving heartbeat', heartbeat.type, heartbeat.time);
+  storeHeartbeat(heartbeat).then(() => {
+    if (lastHeartbeat) {
+      log('total time from last save', heartbeat.time - lastHeartbeat.time);
+    }
+    log('saved heartbeat', heartbeat);
+    lastHeartbeat = heartbeat;
   });
 }
 
@@ -70,7 +56,7 @@ function saveHeartbeat(heartbeat) {
  * @param   {string}  event  The event name
  */
 function onEvent(event) {
-  console.log('event triggered', event);
+  log('activity event triggered:', event);
 
   const now = Date.now();
 
@@ -80,7 +66,7 @@ function onEvent(event) {
 
     // Clean up listeners if we're unloading
     if (event === 'unload') {
-      console.log('Cleaning up content script to unload');
+      log('cleaning up content script to unload');
       for (const cleanUp of cleanUpFunctions) {
         cleanUp();
       }
@@ -109,22 +95,31 @@ function onEvent(event) {
  * Listen for the given events on the given target.
  *
  * @param   {(window|document|HTMLElement)}  target   The target to attach listeners to
- * @param   {string[]}  events                        One or more events to listen for
+ * @param   {string[]} events                         One or more events to listen for
+ * @param   {object}   options                        The options
  * @param   {boolean}  options.throttle               Whether or not to throttle the listeners
+ * @param   {boolean}  options.capture                Whether or not to capture the events
  *
- * @return  {function[]}                              An array of cleanup functions
+ * @return  {(function(): void)[]}                    An array of cleanup functions
  */
-function listen(target, events, options = { throttle: false }) {
+function listen(target, events, options = { throttle: false, capture: false }) {
   return events.map(eventName => {
     let handler = () => {
       onEvent(eventName);
     };
+
     handler = options.throttle
-      ? throttle(handler, 750, { leading: true, trailing: true })
+      ? throttle(handler, 5000, { leading: true, trailing: true })
       : handler;
-    target.addEventListener(eventName, handler, { passive: true });
+    target.addEventListener(eventName, handler, {
+      passive: true,
+      capture: options.capture,
+    });
+
     return () => {
-      target.removeEventListener(eventName, handler, { passive: true });
+      target.removeEventListener(eventName, handler, {
+        capture: options.capture,
+      });
     };
   });
 }
@@ -136,6 +131,7 @@ cleanUpFunctions.push(...listen(window, ['focus', 'blur', 'unload']));
 cleanUpFunctions.push(
   ...listen(document, ['scroll', 'click', 'keypress', 'mousemove'], {
     throttle: true,
+    capture: true,
   })
 );
 

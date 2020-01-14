@@ -17,8 +17,8 @@
   "content_scripts": [
     {
       "matches": ["https://*.notion.so/*"],
-      "js": ["js/content.js"]
+      "js": ["js/content-script.js"]
     }
   ],
-  "permissions": ["storage"]
+  "permissions": ["storage", "activeTab"]
 }

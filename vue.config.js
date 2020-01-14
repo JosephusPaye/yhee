@@ -1,8 +1,10 @@
 module.exports = {
   // Disable filename hashing so we can refer directly to built files in the manifest
   filenameHashing: false,
+  // Keep the extension payload smaller by disabling production sourcemaps
+  productionSourceMap: false,
   pages: {
-    content: 'src/content.js',
+    'content-script': 'src/content-script.js',
     popup: {
       entry: 'src/popup.js',
       template: 'public/index.html',
