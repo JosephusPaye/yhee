@@ -6,7 +6,7 @@
     </h1>
     <div class="bg-gray-200 border-b flex px-6">
       <button
-        class="border-blue-400 px-3 py-2 text-sm tracking-wide uppercase font-medium text-gray-600 hover:text-gray-800"
+        class="border-blue-400 px-3 py-3 text-sm tracking-wide uppercase font-medium text-gray-600 hover:text-gray-800"
         :class="{
           'border-b-1.5 text-gray-900 hover:text-gray-900':
             tab.id === activeTab.id,
@@ -14,9 +14,7 @@
         v-for="tab in tabs"
         :key="tab.id"
         @click="selectTab(tab)"
-      >
-        {{ tab.label }}
-      </button>
+      >{{ tab.label }}</button>
     </div>
     <div class="p-6">
       <slot :activeTab="activeTab"></slot>

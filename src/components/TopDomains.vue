@@ -1,25 +1,34 @@
 <template>
-  <Panel
-    title="Top domains"
-    pre-select="today"
-    :tabs="tabs"
-    @tab-change="onTabChange"
-  >
+  <Panel title="Top domains" pre-select="today" :tabs="tabs" @tab-change="onTabChange">
+    <button
+      slot="actions"
+      @click="chart = chart === 'bar' ? 'pie' : 'bar'"
+      class="h-6 w-6 text-gray-600 hover:text-gray-800"
+      :title="chart === 'bar' ? 'Show as pie chart' : 'Show as bar chart'"
+    >
+      <IconPieChart v-if="chart === 'bar'" />
+      <IconBarChart v-else-if="chart === 'pie'" style="transform: rotate(90deg)" />
+    </button>
     <div v-if="state === 'loading'">Loading...</div>
     <BarChart
-      v-else-if="state === 'has-results'"
-      :chart-data="topDomains"
-      :options="{
-        type: 'horizontalBar',
-      }"
-      :height="`${topDomains.labels.length * 50}px`"
+      v-else-if="state === 'has-results' && chart === 'bar'"
+      :chart-data="barChartData"
+      :height="`${barChartData.labels.length * 50}px`"
+    />
+    <PieChart
+      v-else-if="state === 'has-results' && chart === 'pie'"
+      :chart-data="pieChartData"
+      height="200px"
     />
   </Panel>
 </template>
 
 <script>
 import BarChart from './BarChart.vue';
+import PieChart from './PieChart.vue';
 import Panel from './Panel.vue';
+import IconBarChart from '../assets/icons/bar-chart.svg';
+import IconPieChart from '../assets/icons/pie-chart.svg';
 
 import {
   getTopDomains,
@@ -27,6 +36,7 @@ import {
   fromLastSevenDays,
   getTimeoutPreference,
   aggregateToBarChartData,
+  SOLID_FILL_COLORS,
 } from '../data';
 
 export default {
@@ -35,19 +45,23 @@ export default {
   components: {
     Panel,
     BarChart,
+    PieChart,
+    IconPieChart,
+    IconBarChart,
   },
 
   data() {
     return {
-      topDomains: [],
       state: 'loading',
+      chart: 'bar', // TODO: Remember changes across refreshes?
+      topDomains: [],
       tabs: [
         {
           label: 'Today',
           id: 'today',
         },
         {
-          label: 'This week',
+          label: 'Last 7 Days',
           id: 'this-week',
         },
         {
@@ -56,6 +70,16 @@ export default {
         },
       ],
     };
+  },
+
+  computed: {
+    barChartData() {
+      return this.toBarChartData(this.topDomains);
+    },
+
+    pieChartData() {
+      return this.toPieChartData(this.topDomains);
+    },
   },
 
   async created() {
@@ -74,36 +98,33 @@ export default {
     },
 
     async showToday() {
-      const topDomains = await getTopDomains(
+      this.topDomains = await getTopDomains(
         await getTimeoutPreference(),
         fromToday,
         10
       );
-      this.topDomains = this.toChartData(topDomains);
       this.state = 'has-results';
     },
 
     async showThisWeek() {
-      const topDomains = await getTopDomains(
+      this.topDomains = await getTopDomains(
         await getTimeoutPreference(),
         fromLastSevenDays,
         10
       );
-      this.topDomains = this.toChartData(topDomains);
       this.state = 'has-results';
     },
 
     async showAllTime() {
-      const topDomains = await getTopDomains(
+      this.topDomains = await getTopDomains(
         await getTimeoutPreference(),
         undefined,
         10
       );
-      this.topDomains = this.toChartData(topDomains);
       this.state = 'has-results';
     },
 
-    toChartData(domains) {
+    toBarChartData(domains) {
       return aggregateToBarChartData(
         domains,
         'Total time (minutes)',
@@ -112,6 +133,26 @@ export default {
         },
         domain => {
           return Math.floor(domain.totalTime / 1000 / 60);
+        }
+      );
+    },
+
+    toPieChartData(domains) {
+      return aggregateToBarChartData(
+        domains,
+        'Total time (minutes)',
+        domain => {
+          return domain.origin.replace('https://', '').replace('http://', '');
+        },
+        domain => {
+          return Math.floor(domain.totalTime / 1000 / 60);
+        },
+        {
+          backgroundColor({ dataIndex: index }) {
+            return SOLID_FILL_COLORS[index % SOLID_FILL_COLORS.length];
+          },
+          borderWidth: 2,
+          borderColor: 'rgb(255, 255, 255)',
         }
       );
     },

@@ -34,7 +34,7 @@ import { getStorageData, setStorageData } from './browser';
  * @property {number} totalTime
  */
 
-const enableLogging = true;
+const enableLogging = false;
 
 /**
  * Log the given values if logging is enabled.
@@ -257,7 +257,7 @@ export async function getTopDomains(timeoutPreference, filter, limit) {
     .slice(0, limit);
 }
 
-const LIGHT_FILL_COLORS = [
+export const LIGHT_FILL_COLORS = [
   'rgba(255, 99, 132, 0.2)',
   'rgba(255, 159, 64, 0.2)',
   'rgba(255, 205, 86, 0.2)',
@@ -267,7 +267,7 @@ const LIGHT_FILL_COLORS = [
   'rgba(201, 203, 207, 0.2)',
 ];
 
-const BORDER_COLORS = [
+export const SOLID_FILL_COLORS = [
   'rgb(255, 99, 132)',
   'rgb(255, 159, 64)',
   'rgb(255, 205, 86)',
@@ -280,16 +280,17 @@ const BORDER_COLORS = [
 /**
  * Convert the given aggregate collection to data or a bar chart.
  *
- * @param {Array} aggregate                     The aggregrate collection
- * @param {string} chartLabel                   The chart label
+ * @param {Array} aggregate The aggregrate collection
+ * @param {string} chartLabel The chart label
  * @param {(datapoint: any) => string} getLabel The function to get a datapoint's label
- * @param {(datapoint: any) => string} getData  The function to get a datapoint's value
+ * @param {(datapoint: any) => string} getData The function to get a datapoint's value
  */
 export function aggregateToBarChartData(
   aggregate,
   chartLabel,
   getLabel,
-  getData
+  getData,
+  styleOptions = {}
 ) {
   const labels = [];
   const data = [];
@@ -302,17 +303,20 @@ export function aggregateToBarChartData(
   return {
     labels,
     datasets: [
-      {
-        label: chartLabel,
-        data,
-        backgroundColor({ dataIndex: index }) {
-          return LIGHT_FILL_COLORS[index % LIGHT_FILL_COLORS.length];
+      Object.assign(
+        {
+          label: chartLabel,
+          data,
+          backgroundColor({ dataIndex: index }) {
+            return LIGHT_FILL_COLORS[index % LIGHT_FILL_COLORS.length];
+          },
+          borderColor({ dataIndex: index }) {
+            return SOLID_FILL_COLORS[index % SOLID_FILL_COLORS.length];
+          },
+          borderWidth: 1,
         },
-        borderColor({ dataIndex: index }) {
-          return BORDER_COLORS[index % BORDER_COLORS.length];
-        },
-        borderWidth: 1,
-      },
+        styleOptions
+      ),
     ],
   };
 }
