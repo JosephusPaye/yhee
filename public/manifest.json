@@ -14,11 +14,10 @@
     "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://*.notion.so/*"],
-      "js": ["js/content-script.js"]
-    }
-  ],
-  "permissions": ["storage", "activeTab"]
+  "background": {
+    "scripts": ["js/background-script.js"],
+    "persistent": false
+  },
+  "permissions": ["storage", "activeTab"],
+  "optional_permissions": ["http://*/*", "https://*/*"]
 }

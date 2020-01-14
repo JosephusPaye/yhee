@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "content-scripts-register-polyfill": "^1.0.0",
     "core-js": "^3.4.4",
     "lodash.throttle": "^4.1.1",
     "tailwindcss": "^1.1.4",

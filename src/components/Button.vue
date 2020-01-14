@@ -40,4 +40,17 @@ export default {
     @apply bg-gray-500;
   }
 }
+
+.button-color--primary {
+  @apply bg-blue-500 text-white;
+
+  &:hover,
+  &:focus {
+    @apply bg-blue-600;
+  }
+
+  &:active {
+    @apply bg-blue-700;
+  }
+}
 </style>

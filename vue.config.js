@@ -5,6 +5,7 @@ module.exports = {
   productionSourceMap: false,
   pages: {
     'content-script': 'src/content-script.js',
+    'background-script': 'src/background-script.js',
     popup: {
       entry: 'src/popup.js',
       template: 'public/index.html',
