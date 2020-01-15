@@ -11,11 +11,13 @@
     "chart.js": "^2.9.3",
     "content-scripts-register-polyfill": "^1.0.0",
     "core-js": "^3.4.4",
+    "dexie": "^2.0.4",
     "focus-visible": "^5.0.2",
     "lodash.throttle": "^4.1.1",
     "tailwindcss": "^1.1.4",
     "vue": "^2.6.10",
-    "vue-chartjs": "^3.5.0"
+    "vue-chartjs": "^3.5.0",
+    "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",

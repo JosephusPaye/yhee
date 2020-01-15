@@ -1,5 +1,6 @@
 // @ts-check
-import { getStorageData, setStorageData } from './browser';
+import Dexie from 'dexie';
+import { log } from './log';
 
 /**
  * @typedef {Object} Heartbeat
@@ -34,32 +35,44 @@ import { getStorageData, setStorageData } from './browser';
  * @property {number} totalTime
  */
 
-const enableLogging = false;
+/** @type {Dexie} */
+let database = undefined;
 
 /**
- * Log the given values if logging is enabled.
- *
- * @param {*[]}  values  The values to log
+ * Get or create the database instance.
  */
-export function log(...values) {
-  if (enableLogging) {
-    console.log('[yhee extension]', ...values);
+export function db() {
+  if (database === undefined) {
+    database = new Dexie('yhee_db');
+
+    database.version(1).stores({
+      // Plus 'title' and 'type' (not specified as they are not indexed)
+      heartbeats: '++id, origin, path, time',
+    });
   }
+
+  return database;
 }
 
 /**
- * Get stored heartbeats data from local storage.
+ * Store the given heartbeat in the local database.
  *
- * @param {HeartbeatFilterCallback=} filter
- * @return {Promise<Heartbeat[]>}
+ * @param   {Heartbeat}  heartbeat  The heartbeat
+ *
+ * @return  {Promise<boolean>}
  */
-export async function getHeartbeats(filter) {
-  const data = await getStorageData({ heartbeats: [] });
-
-  /** @type {Heartbeat[]} */
-  const heartbeats = data.heartbeats;
-
-  return filter ? heartbeats.filter(filter) : heartbeats;
+export function storeHeartbeat(heartbeat) {
+  return db()
+    .table('heartbeats')
+    .add(heartbeat)
+    .then(() => {
+      log('heartbeat stored in dexie');
+      return true;
+    })
+    .catch(() => {
+      log('failed to store heartbeat in dexie');
+      return false;
+    });
 }
 
 /**
@@ -71,19 +84,6 @@ export async function getHeartbeats(filter) {
 export async function getTimeoutPreference(conversionFactor = 60 * 1000) {
   const timeoutPreference = 15; // TODO: Make configurable, read from local storage
   return timeoutPreference * conversionFactor;
-}
-
-/**
- * Store the given heartbeat into local storage.
- *
- * @param   {Heartbeat}  heartbeat
- *
- * @return  {Promise<void>}
- */
-export async function storeHeartbeat(heartbeat) {
-  const heartbeats = await getHeartbeats();
-  heartbeats.push(heartbeat);
-  return setStorageData({ heartbeats });
 }
 
 /**
@@ -227,7 +227,10 @@ function groupCollection(collection, property) {
  * @param {string} groupBy                  The property to group by after filtering
  */
 export async function getAggregrate(timeoutPreference, filter, groupBy) {
-  const heartbeats = await getHeartbeats(filter);
+  const heartbeats = await db()
+    .table('heartbeats')
+    .filter(filter)
+    .toArray();
 
   /** @type {Heartbeat[][]} */
   const groups = groupCollection(heartbeats, groupBy);
@@ -255,6 +258,30 @@ export async function getTopDomains(timeoutPreference, filter, limit) {
   return (await getAggregrate(timeoutPreference, filter, 'origin'))
     .sort((a, b) => b.totalTime - a.totalTime)
     .slice(0, limit);
+}
+
+/**
+ * Get durations for the given origin.
+ *
+ * @param {string} origin                   The origin
+ * @param {number} timeoutPreference        The timeout preference for heartbeat aggregation
+ * @param {HeartbeatFilterCallback=} filter The filter to apply
+ * @return {Promise<Duration[]>}
+ */
+export async function getOriginDurations(
+  origin,
+  timeoutPreference,
+  filter = () => true
+) {
+  /** @type {Heartbeat[]} */
+  const heartbeats = await db()
+    .table('heartbeats')
+    .where('origin')
+    .equals(origin)
+    .filter(filter)
+    .toArray();
+
+  return heartbeatsToDurations(heartbeats, timeoutPreference);
 }
 
 export const LIGHT_FILL_COLORS = [

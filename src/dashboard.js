@@ -1,3 +1,5 @@
+import 'webextension-polyfill';
+
 import Vue from 'vue';
 import Dashboard from './Dashboard.vue';
 

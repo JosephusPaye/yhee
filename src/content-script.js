@@ -1,9 +1,11 @@
 // @ts-check
+import browser from 'webextension-polyfill';
 import throttle from 'lodash.throttle';
-import { log, storeHeartbeat } from './data';
+
+import { log } from './modules/log';
 
 /**
- * @typedef {import('./data').Heartbeat} Heartbeat
+ * @typedef {import('./modules/data').Heartbeat} Heartbeat
  */
 
 /** @type {(function(): void)[]} */
@@ -40,14 +42,20 @@ function createHeartbeat(type, time = Date.now()) {
  * @param   {Heartbeat}  heartbeat  The heartbeat
  */
 function saveHeartbeat(heartbeat) {
-  log('saving heartbeat', heartbeat.type, heartbeat.time);
-  storeHeartbeat(heartbeat).then(() => {
-    if (lastHeartbeat) {
-      log('total time from last save', heartbeat.time - lastHeartbeat.time);
-    }
-    log('saved heartbeat', heartbeat);
-    lastHeartbeat = heartbeat;
-  });
+  log(
+    'sending heartbeat to background script to save',
+    heartbeat.type,
+    heartbeat.time
+  );
+  browser.runtime
+    .sendMessage({ action: 'storeHeartbeat', heartbeat })
+    .then(() => {
+      if (lastHeartbeat) {
+        log('total time from last save', heartbeat.time - lastHeartbeat.time);
+      }
+      log('saved heartbeat', heartbeat);
+      lastHeartbeat = heartbeat;
+    });
 }
 
 /**

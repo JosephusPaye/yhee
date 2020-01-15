@@ -1,8 +1,13 @@
 // @ts-check
+import browser from 'webextension-polyfill';
 import 'content-scripts-register-polyfill';
 
-import { getPermissions } from './browser';
-import { log } from './data';
+import { getPermissions } from './modules/browser';
+import { db, storeHeartbeat } from './modules/data';
+import { log } from './modules/log';
+
+// Initialize the database
+db();
 
 /** @type {Map<string, Promise<any>>} */
 const registeredScripts = new Map();
@@ -19,7 +24,7 @@ async function registerOrigins(origins) {
 
   // Register one at a time to allow removing one at a time as well
   for (const origin of origins || []) {
-    const registeredScript = chrome.contentScripts
+    const registeredScript = browser.contentScripts
       .register({
         js: [{ file: 'js/content-script.js' }],
         matches: [origin],
@@ -33,7 +38,7 @@ async function registerOrigins(origins) {
   }
 }
 
-chrome.permissions.onAdded.addListener(function(permissions) {
+browser.permissions.onAdded.addListener(function(permissions) {
   log('permissions added, examining origins to register content script');
   if (permissions.origins && permissions.origins.length > 0) {
     log(
@@ -44,7 +49,7 @@ chrome.permissions.onAdded.addListener(function(permissions) {
   }
 });
 
-chrome.permissions.onRemoved.addListener(async function(permissions) {
+browser.permissions.onRemoved.addListener(async function(permissions) {
   log('permissions removed, examining origins to register content script');
 
   if (!permissions.origins || permissions.origins.length === 0) {
@@ -62,6 +67,13 @@ chrome.permissions.onRemoved.addListener(async function(permissions) {
       log('unregistering script for origin', origin);
       (await script).unregister();
     }
+  }
+});
+
+browser.runtime.onMessage.addListener(function(request) {
+  if (request.action === 'storeHeartbeat') {
+    log('storing heartbeat received from content script into dexie', request);
+    return storeHeartbeat(request.heartbeat);
   }
 });
 

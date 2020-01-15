@@ -148,7 +148,7 @@ export default {
     async showAllTime() {
       this.topDomains = await getTopDomains(
         await getTimeoutPreference(),
-        undefined,
+        () => true,
         10
       );
       this.timespan = 'all-time';

@@ -98,10 +98,9 @@ import {
   requestPermission,
   removePermission,
   promptForReload,
-} from './browser';
+} from './modules/browser';
 import {
-  getHeartbeats,
-  heartbeatsToDurations,
+  getOriginDurations,
   fromToday,
   humanReadableDuration,
   getTimeoutPreference,
@@ -161,11 +160,11 @@ export default {
       return;
     }
 
-    const heartbeats = await getHeartbeats(heartbeat => {
-      return fromToday(heartbeat) && heartbeat.origin === url.origin;
-    });
-
-    const durations = heartbeatsToDurations(heartbeats, this.timeoutPreference);
+    const durations = await getOriginDurations(
+      url.origin,
+      this.timeoutPreference,
+      fromToday
+    );
 
     if (durations.length === 0) {
       this.state = 'no-data';
