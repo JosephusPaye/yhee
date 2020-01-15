@@ -63,30 +63,6 @@ Each heartbeat stores the the type of event that triggered it, the current time,
 }
 ```
 
-## Developing
-
-### Clone the repo and install dependencies
-
-```sh
-git clone https://github.com/JosephusPaye/yhee.git
-cd yhee
-yarn install
-```
-
-### Compile for production
-
-```sh
-yarn build
-```
-
-The generated `dist` folder can then be loaded into Chrome as an unpacked extension.
-
-### Lint and fix files
-
-```sh
-yarn lint
-```
-
 ## Todo
 
 ### For [#CreateWeekly](https://dev.to/josephuspaye/createweekly-create-something-new-publicly-every-week-in-2020-1nh9)
@@ -109,6 +85,10 @@ yarn lint
 - [ ] Add a syncing system to share data across devices
 - [ ] Add export option: export heartbeat data as JSON
 - [ ] Rewrite in TypeScript (currently has JSDoc types that are checked by TypeScript in VSCode)
+
+## Contributing
+
+See [contribution guide](CONTRIBUTING.md).
 
 ## Licence
 
