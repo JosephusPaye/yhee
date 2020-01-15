@@ -109,4 +109,6 @@ yarn lint
 - [ ] Add export option: export heartbeat data as JSON
 - [ ] Rewrite in TypeScript (currently has JSDoc types that are checked by TypeScript in VSCode)
 
+## Licence
 
+[MIT](LICENCE)
