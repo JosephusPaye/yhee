@@ -100,10 +100,11 @@ yarn lint
 
 ### Maybe later (contributions welcome)
 
+- [ ] Make timeout threshold a configurable setting
+- [ ] Add ability to view all tracked domains in dashboard, and remove a tracked domain with its data
 - [ ] Add more charts
   - [ ] Per-domain chart showing top pages
   - [ ] Duration chart that shows what times of the day the each domain/page was visited
-- [ ] Make timeout threshold a configurable setting
 - [ ] Add dark mode for the popup and dashboard, and automatically switch based on current browser/OS setting
 - [ ] Add a syncing system to share data across devices
 - [ ] Add export option: export heartbeat data as JSON
