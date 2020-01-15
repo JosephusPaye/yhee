@@ -1,6 +1,6 @@
 # Yhee
 
-Yhee is a time tracking browser extension that tracks how much time you spend on different websites and webpages, and displays the results in beautiful charts. All tracked data is completely local and never leaves your computer.
+Yhee is a time tracking browser extension that tracks how much time you spend on different websites and webpages, and displays the results in beautiful charts. Tracking is strictly opt-in, and all tracked data is stored locally, never leaving your computer.
 
 This project is part of [#CreateWeekly](https://dev.to/josephuspaye/createweekly-create-something-new-publicly-every-week-in-2020-1nh9), my attempt to create something new publicly every week in 2020.
 
