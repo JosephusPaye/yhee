@@ -4,6 +4,10 @@ Yhee is a time tracking browser extension that tracks how much time you spend on
 
 This project is part of [#CreateWeekly](https://dev.to/josephuspaye/createweekly-create-something-new-publicly-every-week-in-2020-1nh9), my attempt to create something new publicly every week in 2020.
 
+![Screenshot of Yhee popup](./screenshots/popup.png)
+
+![Screenshot of Yhee dashboard](./screenshots/dashboard.png)
+
 ## How to use
 
 ### Setup
