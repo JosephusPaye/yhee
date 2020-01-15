@@ -60,7 +60,7 @@ import {
   getTimeoutPreference,
   aggregateToBarChartData,
   SOLID_FILL_COLORS,
-} from '../data';
+} from '../modules/data';
 
 export default {
   name: 'TopDomains',

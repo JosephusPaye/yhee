@@ -104,7 +104,7 @@ import {
   fromToday,
   humanReadableDuration,
   getTimeoutPreference,
-} from './data';
+} from './modules/data';
 
 export default {
   name: 'app',
