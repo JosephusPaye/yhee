@@ -1,7 +1,7 @@
 {
   "name": "Yhee: Time Tracker",
   "description": "⌛ Track how much time you spend on different websites and webpages.",
-  "version": "1.0",
+  "version": "0.1",
   "manifest_version": 2,
   "icons": {
     "16": "icon-16.png",
