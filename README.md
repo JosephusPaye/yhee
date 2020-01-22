@@ -12,7 +12,7 @@ This project is part of [#CreateWeekly](https://dev.to/josephuspaye/createweekly
 
 ### Setup
 
-- Install the extension.
+- Install the extension: <https://chrome.google.com/webstore/detail/yhee-time-tracker/jfbnogkpfjchbnamkpbgacpnnegpgjgj>.
 - Visit each domain you want to track, click the extension icon in the browser toolbar, then click **Track this domain**.
 - The browser will prompt you to give Yhee permission to access the domain, and if you allow, Yhee will start tracking the time you spend on that domain.
 
