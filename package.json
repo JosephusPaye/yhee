@@ -11,7 +11,7 @@
     "chart.js": "^2.9.3",
     "content-scripts-register-polyfill": "^1.0.0",
     "core-js": "^3.4.4",
-    "dexie": "^2.0.4",
+    "dexie": "^3.2.2",
     "focus-visible": "^5.0.2",
     "lodash.throttle": "^4.1.1",
     "tailwindcss": "^1.1.4",
